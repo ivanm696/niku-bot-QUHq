@@ -31,7 +31,7 @@ user_context = {}
 async def cmd_start(message: types.Message):
     user_context[message.from_user.id] = []
     await message.answer(
-        "🤖 Привет! Я NicuAI. Теперь мы настроили правильную модель Llama через SDK.\n"
+        "🤖 Привет! Я NicuAI. Модель обновлена на актуальную Llama-3.3-70b-versatile.\n"
         "Задай мне любой вопрос!"
     )
 
@@ -63,9 +63,9 @@ async def handle_message(message: types.Message):
         }
         messages_to_send = [system_prompt] + user_context[user_id]
 
-        # Используем официальный ID модели Llama 3.3 70B для Python SDK
+        # Вызываем рабочую модель
         completion = groq_client.chat.completions.create(
-            model="llama-3.3-70b-specdec",
+            model="llama-3.3-70b-versatile",
             messages=messages_to_send,
             temperature=0.7
         )
@@ -75,12 +75,11 @@ async def handle_message(message: types.Message):
         # Сохраняем ответ в память бота
         user_context[user_id].append({"role": "assistant", "content": bot_response})
 
-        # Отправляем чистый текст без строгой разметки
+        # Отправляем чистый текст
         await message.answer(bot_response)
 
     except Exception as e:
         logger.error(f"Ошибка при вызове Groq API: {e}")
-        # Если API выдаст ошибку, бот не промолчит, а честно напишет её причину
         await message.answer(f"⚠️ Ошибка вызова Groq API: {str(e)}")
 
 
